@@ -27,11 +27,42 @@
     page_version: 'v2'
   };
 
+  const metaStandardEventNames = {
+    generate_lead: 'Lead',
+    sign_up: 'CompleteRegistration',
+    contact_click: 'Contact',
+    view_item: 'ViewContent',
+    add_to_cart: 'AddToCart',
+    begin_checkout: 'InitiateCheckout',
+    search: 'Search'
+  };
+
+  function trackMetaEvent(eventName, parameters) {
+    if (eventName === 'page_view' || /scroll/i.test(eventName)) return;
+
+    if (eventName === 'purchase') {
+      if (window.fbq) fbq('track', 'Purchase', {
+        value: parameters.value,
+        currency: parameters.currency || 'KRW'
+      });
+      return;
+    }
+
+    const metaEventName = metaStandardEventNames[eventName];
+    if (metaEventName) {
+      if (window.fbq) fbq('track', metaEventName);
+      return;
+    }
+
+    if (window.fbq) fbq('trackCustom', eventName);
+  }
+
   function track(eventName, parameters = {}) {
     const payload = { ...commonParameters, ...parameters };
 
     if (hasMeasurementId) {
       window.gtag('event', eventName, payload);
+      trackMetaEvent(eventName, payload);
       return;
     }
 
