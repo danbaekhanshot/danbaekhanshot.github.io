@@ -61,6 +61,9 @@
     const payload = { ...commonParameters, ...parameters };
 
     if (hasMeasurementId) {
+      if (eventName === 'generate_lead') {
+        if (window.sendLeadLog) window.sendLeadLog();
+      }
       window.gtag('event', eventName, payload);
       trackMetaEvent(eventName, payload);
       return;
@@ -147,4 +150,5 @@
     isConfigured: hasMeasurementId
   };
 })();
+
 
